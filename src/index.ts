@@ -5,6 +5,7 @@ import { finderCategory } from "./categories/finder.js";
 import { clipboardCategory } from "./categories/clipboard.js";
 import { notificationsCategory } from "./categories/notifications.js";
 import { itermCategory } from "./categories/iterm.js";
+import { remindersCategory } from "./categories/reminders/index.js";
 
 const server = new AppleScriptFramework({
   name: "applescript-server",
@@ -19,6 +20,7 @@ server.addCategory(finderCategory);
 server.addCategory(clipboardCategory);
 server.addCategory(notificationsCategory);
 server.addCategory(itermCategory);
+server.addCategory(remindersCategory);
 
 // Start the server
 server.run().catch(console.error);
