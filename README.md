@@ -3,6 +3,8 @@
 A Model Context Protocol server that enables LLM applications to interact with macOS through AppleScript.
 This server provides a standardized interface for AI applications to control system functions, manage files, handle notifications, and more.
 
+<a href="https://glama.ai/mcp/servers/0t5gydjcqw"><img width="380" height="200" src="https://glama.ai/mcp/servers/0t5gydjcqw/badge" alt="applescript-mcp MCP server" /></a>
+
 ## Features
 
 - 🗓️ Calendar management (events, reminders)
