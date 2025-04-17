@@ -1,4 +1,9 @@
-import { ScriptCategory } from "../types/index.js";
+import { ScriptCategory } from "../../types/index.js";
+import { readScriptFile, scriptFrom, getDirname } from "../../utils/fileUtils.js";
+import path from "path";
+
+// Define the base path for scripts using ES modules approach
+const SCRIPTS_DIR = path.join(getDirname(import.meta.url), "scripts");
 
 /**
  * Pages-related scripts.
@@ -21,20 +26,7 @@ export const pagesCategory: ScriptCategory = {
         },
         required: ["content"]
       },
-      script: (args) => `
-        try
-          tell application "Pages"
-            -- Create new document
-            set newDoc to make new document
-            
-            set the body text of newDoc to "${args.content.replace(/"/g, '\\"')}"
-            activate
-            return "Document created successfully with plain text content"
-          end tell
-        on error errMsg
-          return "Failed to create document: " & errMsg
-        end try
-      `
+      script: (args: any) => scriptFrom(path.join(SCRIPTS_DIR, "create_document.applescript"))(args),
     }
   ]
 };

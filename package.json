@@ -1,13 +1,15 @@
 {
   "name": "applescript-mcp",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "AppleScript MCP Framework",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node --esm src/index.ts"
+    "dev": "ts-node --esm src/index.ts",
+    "test": "npx jest tests/simple.test.js tests/categories/simple-category.test.js tests/scripts/simple-script.test.js tests/framework-commonjs.test.js tests/utils/fileUtils-commonjs.test.js tests/categories/category-commonjs.test.js tests/integration/system-category-commonjs.test.js tests/mocks/applescript-mocks-commonjs.test.js tests/scripts/script-execution.test.js tests/categories/clipboard-category.test.js tests/integration/error-handling.test.js",
+    "test:watch": "npx jest --watch tests/simple.test.js tests/categories/simple-category.test.js tests/scripts/simple-script.test.js tests/framework-commonjs.test.js tests/utils/fileUtils-commonjs.test.js tests/categories/category-commonjs.test.js tests/integration/system-category-commonjs.test.js tests/mocks/applescript-mocks-commonjs.test.js tests/scripts/script-execution.test.js tests/categories/clipboard-category.test.js tests/integration/error-handling.test.js"
   },
   "keywords": [
     "mcp",
@@ -20,8 +22,11 @@
     "@modelcontextprotocol/sdk": "^1.1.1"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "ts-node": "^10.9.0"
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
   }
 }

@@ -1,0 +1,1 @@
+set volume ${Math.round((args.level / 100) * 7)}

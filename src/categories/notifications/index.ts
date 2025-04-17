@@ -1,5 +1,9 @@
-// src/categories/notifications.ts
-import { ScriptCategory } from "../types/index.js";
+import { ScriptCategory } from "../../types/index.js";
+import { readScriptFile, scriptFrom, getDirname } from "../../utils/fileUtils.js";
+import path from "path";
+
+// Define the base path for scripts using ES modules approach
+const SCRIPTS_DIR = path.join(getDirname(import.meta.url), "scripts");
 
 /**
  * Notification-related scripts.
@@ -13,16 +17,7 @@ export const notificationsCategory: ScriptCategory = {
     {
       name: "toggle_do_not_disturb",
       description: "Toggle Do Not Disturb mode using keyboard shortcut",
-      script: `
-        try
-          tell application "System Events"
-            keystroke "z" using {control down, option down, command down}
-          end tell
-          return "Toggled Do Not Disturb mode"
-        on error errMsg
-          return "Failed to toggle Do Not Disturb: " & errMsg
-        end try
-      `,
+      script: readScriptFile(path.join(SCRIPTS_DIR, "toggle_do_not_disturb.applescript")),
     },
     {
       name: "send_notification",
@@ -46,9 +41,7 @@ export const notificationsCategory: ScriptCategory = {
         },
         required: ["title", "message"],
       },
-      script: (args) => `
-        display notification "${args.message}" with title "${args.title}" ${args.sound ? 'sound name "default"' : ""}
-      `,
+      script: (args: any) => scriptFrom(path.join(SCRIPTS_DIR, "send_notification.applescript"))(args),
     },
   ],
 };

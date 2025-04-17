@@ -1,0 +1,1 @@
+display notification "${args.message}" with title "${args.title}" ${args.sound ? 'sound name "default"' : ""}

@@ -1,19 +1,4 @@
-import { ScriptCategory } from "../types/index.js";
-
-/**
- * iTerm-related scripts.
- * * paste_clipboard: Pastes the clipboard to an iTerm window
- * * run: Run a command in iTerm
- */
-export const itermCategory: ScriptCategory = {
-  name: "iterm",
-  description: "iTerm terminal operations",
-  scripts: [
-    {
-      name: "paste_clipboard",
-      description: "Paste clipboard content into iTerm",
-      script: `
-        tell application "System Events" to keystroke "c" using {command down}
+tell application "System Events" to keystroke "c" using {command down}
         delay 0.1
         tell application "iTerm"
           set w to current window
@@ -57,7 +42,3 @@ export const itermCategory: ScriptCategory = {
             activate
           end tell
         end tell
-      `,
-    },
-  ],
-};

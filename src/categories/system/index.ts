@@ -1,4 +1,10 @@
-import { ScriptCategory } from "../types/index.js";
+import { ScriptCategory } from "../../types/index.js";
+import { readScriptFile, scriptFrom, getDirname } from "../../utils/fileUtils.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Define the base path for scripts using ES modules approach
+const SCRIPTS_DIR = path.join(getDirname(import.meta.url), "scripts");
 
 /**
  * System-related scripts.
@@ -26,13 +32,12 @@ export const systemCategory: ScriptCategory = {
         },
         required: ["level"],
       },
-      script: (args) => `set volume ${Math.round((args.level / 100) * 7)}`,
+      script: (args: any) => scriptFrom(path.join(SCRIPTS_DIR, "volume.applescript"))(args),
     },
     {
       name: "get_frontmost_app",
       description: "Get the name of the frontmost application",
-      script:
-        'tell application "System Events" to get name of first process whose frontmost is true',
+      script: readScriptFile(path.join(SCRIPTS_DIR, "get_frontmost_app.applescript")),
     },
     {
       name: "launch_app",
@@ -47,16 +52,7 @@ export const systemCategory: ScriptCategory = {
         },
         required: ["name"],
       },
-      script: (args) => `
-            try
-              tell application "${args.name}"
-                activate
-              end tell
-              return "Application ${args.name} launched successfully"
-            on error errMsg
-              return "Failed to launch application: " & errMsg
-            end try
-          `,
+      script: (args: any) => scriptFrom(path.join(SCRIPTS_DIR, "launch_app.applescript"))(args),
     },
     {
       name: "quit_app",
@@ -76,40 +72,17 @@ export const systemCategory: ScriptCategory = {
         },
         required: ["name"],
       },
-      script: (args) => `
-            try
-              tell application "${args.name}"
-                ${args.force ? "quit saving no" : "quit"}
-              end tell
-              return "Application ${args.name} quit successfully"
-            on error errMsg
-              return "Failed to quit application: " & errMsg
-            end try
-          `,
+      script: (args: any) => scriptFrom(path.join(SCRIPTS_DIR, "quit_app.applescript"))(args),
     },
     {
       name: "toggle_dark_mode",
       description: "Toggle system dark mode",
-      script: `
-            tell application "System Events"
-              tell appearance preferences
-                set dark mode to not dark mode
-                return "Dark mode is now " & (dark mode as text)
-              end tell
-            end tell
-          `,
+      script: readScriptFile(path.join(SCRIPTS_DIR, "toggle_dark_mode.applescript")),
     },
     {
       name: "get_battery_status",
       description: "Get battery level and charging status",
-      script: `
-            try
-              set powerSource to do shell script "pmset -g batt"
-              return powerSource
-            on error errMsg
-              return "Failed to get battery status: " & errMsg
-            end try
-          `,
+      script: readScriptFile(path.join(SCRIPTS_DIR, "get_battery_status.applescript")),
     },
   ],
 };

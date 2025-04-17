@@ -1,4 +1,9 @@
-import { ScriptCategory } from "../types/index.js";
+import { ScriptCategory } from "../../types/index.js";
+import { readScriptFile, scriptFrom, getDirname } from "../../utils/fileUtils.js";
+import path from "path";
+
+// Define the base path for scripts using ES modules approach
+const SCRIPTS_DIR = path.join(getDirname(import.meta.url), "scripts");
 
 /**
  * Shortcuts-related scripts.
@@ -25,19 +30,7 @@ export const shortcutsCategory: ScriptCategory = {
         },
         required: ["name"],
       },
-      script: (args) => `
-        try
-          tell application "Shortcuts Events"
-            ${args.input ? 
-              `run shortcut "${args.name}" with input "${args.input}"` :
-              `run shortcut "${args.name}"`
-            }
-          end tell
-          return "Shortcut '${args.name}' executed successfully"
-        on error errMsg
-          return "Failed to run shortcut: " & errMsg
-        end try
-      `,
+      script: (args: any) => scriptFrom(path.join(SCRIPTS_DIR, "run_shortcut.applescript"))(args),
     },
   ],
 };
