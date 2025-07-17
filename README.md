@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/joshrutkowski-applescript-mcp-badge.png)](https://mseep.ai/app/joshrutkowski-applescript-mcp)
+
 # applescript-mcp MCP Server
 
 A Model Context Protocol server that enables LLM applications to interact with macOS through AppleScript.
