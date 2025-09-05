@@ -3,6 +3,7 @@ import { ScriptCategory } from "../types/index.js";
 /**
  * System-related scripts.
  * * volume: Set system volume
+ * * get_volume: Get current system volume
  * * get_frontmost_app: Get the name of the frontmost application
  * * launch_app: Launch an application
  * * quit_app: Quit an application
@@ -27,6 +28,19 @@ export const systemCategory: ScriptCategory = {
         required: ["level"],
       },
       script: (args) => `set volume ${Math.round((args.level / 100) * 7)}`,
+    },
+    {
+      name: "get_volume",
+      description: "Get current system volume level (0-100)",
+      script: `
+            try
+              -- Get the current output volume from system settings (returns 0-100)
+              set currentVolume to output volume of (get volume settings)
+              return "Current volume level: " & currentVolume & "%"
+            on error errMsg
+              return "Failed to get volume: " & errMsg
+            end try
+          `,
     },
     {
       name: "get_frontmost_app",
