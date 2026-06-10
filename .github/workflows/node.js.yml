@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [18.x, 24.x]
         # Using macOS runners since this is an AppleScript project
 
     steps:
