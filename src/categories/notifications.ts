@@ -1,5 +1,6 @@
 // src/categories/notifications.ts
 import { ScriptCategory } from "../types/index.js";
+import { escapeAppleScriptString as esc } from "../utils/escape.js";
 
 /**
  * Notification-related scripts.
@@ -47,7 +48,7 @@ export const notificationsCategory: ScriptCategory = {
         required: ["title", "message"],
       },
       script: (args) => `
-        display notification "${args.message}" with title "${args.title}" ${args.sound ? 'sound name "default"' : ""}
+        display notification "${esc(args.message)}" with title "${esc(args.title)}" ${args.sound ? 'sound name "default"' : ""}
       `,
     },
   ],

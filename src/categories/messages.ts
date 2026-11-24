@@ -1,4 +1,9 @@
 import { ScriptCategory } from "../types/index.js";
+import {
+  escapeAppleScriptString as esc,
+  escapeSqlString,
+  toBoundedInt,
+} from "../utils/escape.js";
 
 /**
  * iMessage related scripts
@@ -75,13 +80,8 @@ export const messagesCategory: ScriptCategory = {
  on run
 	-- Path to the Messages database
 	set dbPath to (do shell script "echo ~/Library/Messages/chat.db")
-	
-	-- Create a temporary SQL file for our query
-	set tempFile to (do shell script "mktemp /tmp/imessage_query.XXXXXX")
-	
-	-- Write SQL query to temp file
-	do shell script "cat > " & quoted form of tempFile & " << 'EOF'
-SELECT
+
+	set sqlQuery to "SELECT
     datetime(message.date/1000000000 + strftime('%s', '2001-01-01'), 'unixepoch', 'localtime') as message_date,
     handle.id as sender,
     message.text as message_text,
@@ -93,15 +93,11 @@ FROM
     LEFT JOIN chat ON chat_message_join.chat_id = chat.ROWID
 ORDER BY
     message.date DESC
-LIMIT ${args.limit};
-EOF"
-	
-	-- Execute the query
-	set queryResult to do shell script "sqlite3 " & quoted form of dbPath & " < " & quoted form of tempFile
-	
-	-- Clean up temp file
-	do shell script "rm " & quoted form of tempFile
-	
+LIMIT ${toBoundedInt(args.limit, 100, 1, 10000)};"
+
+	-- Execute the query; quoted form keeps the SQL a single shell argument
+	set queryResult to do shell script "sqlite3 " & quoted form of dbPath & " " & quoted form of sqlQuery
+
 	-- Process and display results
 	set resultList to paragraphs of queryResult
 	set messageData to {}
@@ -152,50 +148,45 @@ end run
 on run
 	-- Path to the Messages database
 	set dbPath to (do shell script "echo ~/Library/Messages/chat.db")
-	
-	-- Create a temporary SQL file for our query
-	set tempFile to (do shell script "mktemp /tmp/imessage_search.XXXXXX")
-	
+
 	-- Build WHERE clause based on provided parameters
 	set whereClause to ""
-	
+
 	${args.searchText ? `
 	-- Add search text condition if provided
-	set whereClause to whereClause & "message.text LIKE '%${args.searchText.replace(/'/g, "''")}%' "
+	set whereClause to whereClause & "message.text LIKE '%${esc(escapeSqlString(args.searchText))}%' "
 	` : ''}
-	
+
 	${args.sender ? `
 	-- Add sender condition if provided
 	if length of whereClause > 0 then
 		set whereClause to whereClause & "AND "
 	end if
-	set whereClause to whereClause & "handle.id LIKE '%${args.sender.replace(/'/g, "''")}%' "
+	set whereClause to whereClause & "handle.id LIKE '%${esc(escapeSqlString(args.sender))}%' "
 	` : ''}
-	
+
 	${args.chatId ? `
 	-- Add chat ID condition if provided
 	if length of whereClause > 0 then
 		set whereClause to whereClause & "AND "
 	end if
-	set whereClause to whereClause & "chat.chat_identifier = '${args.chatId.replace(/'/g, "''")}' "
+	set whereClause to whereClause & "chat.chat_identifier = '${esc(escapeSqlString(args.chatId))}' "
 	` : ''}
-	
+
 	${args.daysBack ? `
 	-- Add date range condition
 	if length of whereClause > 0 then
 		set whereClause to whereClause & "AND "
 	end if
-	set whereClause to whereClause & "message.date > (strftime('%s', 'now', '-${args.daysBack} days') - strftime('%s', '2001-01-01')) * 1000000000 "
+	set whereClause to whereClause & "message.date > (strftime('%s', 'now', '-${toBoundedInt(args.daysBack, 30, 1, 36500)} days') - strftime('%s', '2001-01-01')) * 1000000000 "
 	` : ''}
-	
+
 	-- If no search parameters were provided, add a default condition to avoid returning all messages
 	if length of whereClause = 0 then
 		set whereClause to "1=1 "
 	end if
-	
-	-- Write SQL query to temp file
-	do shell script "cat > " & quoted form of tempFile & " << 'EOF'
-SELECT
+
+	set sqlQuery to "SELECT
     datetime(message.date/1000000000 + strftime('%s', '2001-01-01'), 'unixepoch', 'localtime') as message_date,
     handle.id as sender,
     message.text as message_text,
@@ -210,14 +201,10 @@ WHERE
     " & whereClause & "
 ORDER BY
     message.date DESC
-LIMIT ${args.limit};
-EOF"
-	
-	-- Execute the query
-	set queryResult to do shell script "sqlite3 " & quoted form of dbPath & " < " & quoted form of tempFile
-	
-	-- Clean up temp file
-	do shell script "rm " & quoted form of tempFile
+LIMIT ${toBoundedInt(args.limit, 50, 1, 10000)};"
+
+	-- Execute the query; quoted form keeps the SQL a single shell argument
+	set queryResult to do shell script "sqlite3 " & quoted form of dbPath & " " & quoted form of sqlQuery
 	
 	-- Process and display results
 	set resultList to paragraphs of queryResult
@@ -257,8 +244,8 @@ end run
       script: (args) => `
 on run
   -- Get the recipient and message body
-  set recipient to "${args.recipient}"
-  set messageBody to "${args.body || ''}"
+  set recipient to "${esc(args.recipient)}"
+  set messageBody to "${esc(args.body || '')}"
   set autoSend to ${args.auto === true ? "true" : "false"}
   
   if autoSend then
@@ -268,10 +255,10 @@ on run
       set targetService to 1st service whose service type = iMessage
       
       -- Send the message
-      set targetBuddy to buddy "${args.recipient}" of targetService
-      send "${args.body || ''}" to targetBuddy
+      set targetBuddy to buddy "${esc(args.recipient)}" of targetService
+      send "${esc(args.body || '')}" to targetBuddy
       
-      return "Message sent to " & "${args.recipient}"
+      return "Message sent to " & "${esc(args.recipient)}"
     end tell
   else
     -- Just open Messages app with pre-filled content

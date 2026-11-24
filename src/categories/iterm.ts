@@ -1,4 +1,5 @@
 import { ScriptCategory } from "../types/index.js";
+import { escapeAppleScriptString as esc } from "../utils/escape.js";
 
 /**
  * iTerm-related scripts.
@@ -53,7 +54,7 @@ export const itermCategory: ScriptCategory = {
             tell w's current session
           `
           }
-            write text "${args.command}"
+            write text "${esc(args.command)}"
             activate
           end tell
         end tell

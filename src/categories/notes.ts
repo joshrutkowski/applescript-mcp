@@ -1,4 +1,5 @@
 import { ScriptCategory } from "../types/index.js";
+import { escapeAppleScriptString as esc, toBoundedInt } from "../utils/escape.js";
 
 /**
  * Generates HTML content for a note based on user input
@@ -116,7 +117,7 @@ export const notesCategory: ScriptCategory = {
         
         return `
           tell application "Notes"
-            make new note with properties {body:"${htmlContent}", name:"${title}"}
+            make new note with properties {body:"${esc(htmlContent)}", name:"${esc(title)}"}
           end tell
         `;
       },
@@ -173,7 +174,7 @@ export const notesCategory: ScriptCategory = {
         
         return `
           tell application "Notes"
-            make new note with properties {body:"${html.replace(/"/g, '\\"')}", name:"${title}"}
+            make new note with properties {body:"${esc(html)}", name:"${esc(title)}"}
           end tell
         `;
       },
@@ -201,13 +202,13 @@ export const notesCategory: ScriptCategory = {
         if (folder) {
           return `
             tell application "Notes"
-              set folderList to folders whose name is "${folder}"
+              set folderList to folders whose name is "${esc(folder)}"
               if length of folderList > 0 then
                 set targetFolder to item 1 of folderList
                 set noteNames to name of notes of targetFolder
                 return noteNames as string
               else
-                return "Folder not found: ${folder}"
+                return "Folder not found: ${esc(folder)}"
               end if
             end tell
           `;
@@ -239,10 +240,10 @@ export const notesCategory: ScriptCategory = {
         if (folder) {
           return `
             tell application "Notes"
-              set folderList to folders whose name is "${folder}"
+              set folderList to folders whose name is "${esc(folder)}"
               if length of folderList > 0 then
                 set targetFolder to item 1 of folderList
-                set matchingNotes to notes of targetFolder whose name is "${title}"
+                set matchingNotes to notes of targetFolder whose name is "${esc(title)}"
                 if length of matchingNotes > 0 then
                   set n to item 1 of matchingNotes
                   set noteTitle to name of n
@@ -258,17 +259,17 @@ export const notesCategory: ScriptCategory = {
                   
                   return jsonResult
                 else
-                  return "Note not found: ${title}"
+                  return "Note not found: ${esc(title)}"
                 end if
               else
-                return "Folder not found: ${folder}"
+                return "Folder not found: ${esc(folder)}"
               end if
             end tell
           `;
         } else {
           return `
             tell application "Notes"
-              set matchingNotes to notes whose name is "${title}"
+              set matchingNotes to notes whose name is "${esc(title)}"
               if length of matchingNotes > 0 then
                 set n to item 1 of matchingNotes
                 set noteTitle to name of n
@@ -284,7 +285,7 @@ export const notesCategory: ScriptCategory = {
                 
                 return jsonResult
               else
-                return "Note not found: ${title}"
+                return "Note not found: ${esc(title)}"
               end if
             end tell
           `;
@@ -314,19 +315,19 @@ export const notesCategory: ScriptCategory = {
         if (folder) {
           return `
             tell application "Notes"
-              set folderList to folders whose name is "${folder}"
+              set folderList to folders whose name is "${esc(folder)}"
               if length of folderList > 0 then
                 set targetFolder to item 1 of folderList
                 set matchingNotes to {}
                 set allNotes to notes of targetFolder
                 repeat with n in allNotes
-                  if name of n contains "${query}" or body of n contains "${query}" then
+                  if name of n contains "${esc(query)}" or body of n contains "${esc(query)}" then
                     set end of matchingNotes to n
                   end if
                 end repeat
                 
                 set resultCount to length of matchingNotes
-                if resultCount > ${limit} then set resultCount to ${limit}
+                if resultCount > ${toBoundedInt(limit, 5, 1, 1000)} then set resultCount to ${toBoundedInt(limit, 5, 1, 1000)}
                 
                 set jsonResult to "["
                 repeat with i from 1 to resultCount
@@ -349,7 +350,7 @@ export const notesCategory: ScriptCategory = {
                 
                 return jsonResult
               else
-                return "Folder not found: ${folder}"
+                return "Folder not found: ${esc(folder)}"
               end if
             end tell
           `;
@@ -359,13 +360,13 @@ export const notesCategory: ScriptCategory = {
               set matchingNotes to {}
               set allNotes to notes
               repeat with n in allNotes
-                if name of n contains "${query}" or body of n contains "${query}" then
+                if name of n contains "${esc(query)}" or body of n contains "${esc(query)}" then
                   set end of matchingNotes to n
                 end if
               end repeat
               
               set resultCount to length of matchingNotes
-              if resultCount > ${limit} then set resultCount to ${limit}
+              if resultCount > ${toBoundedInt(limit, 5, 1, 1000)} then set resultCount to ${toBoundedInt(limit, 5, 1, 1000)}
               
               set jsonResult to "["
               repeat with i from 1 to resultCount

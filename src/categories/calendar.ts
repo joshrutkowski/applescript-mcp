@@ -1,4 +1,10 @@
 import { ScriptCategory } from "../types/index.js";
+import { escapeAppleScriptString as esc, toBoundedInt } from "../utils/escape.js";
+
+/** Read the 2-digit HH, MM or SS field of "YYYY-MM-DD HH:MM:SS" as a bounded integer. */
+function timeField(value: unknown, start: number, max: number): number {
+  return toBoundedInt(String(value ?? "").slice(start, start + 2), 0, 0, max);
+}
 
 /**
  * Calendar-related scripts.
@@ -38,17 +44,17 @@ export const calendarCategory: ScriptCategory = {
       script: (args) => `
         tell application "Calendar"
           set theStartDate to current date
-          set hours of theStartDate to ${args.startDate.slice(11, 13)}
-          set minutes of theStartDate to ${args.startDate.slice(14, 16)}
-          set seconds of theStartDate to ${args.startDate.slice(17, 19)}
+          set hours of theStartDate to ${timeField(args.startDate, 11, 23)}
+          set minutes of theStartDate to ${timeField(args.startDate, 14, 59)}
+          set seconds of theStartDate to ${timeField(args.startDate, 17, 59)}
 
           set theEndDate to theStartDate + (1 * hours)
-          set hours of theEndDate to ${args.endDate.slice(11, 13)}
-          set minutes of theEndDate to ${args.endDate.slice(14, 16)}
-          set seconds of theEndDate to ${args.endDate.slice(17, 19)}
+          set hours of theEndDate to ${timeField(args.endDate, 11, 23)}
+          set minutes of theEndDate to ${timeField(args.endDate, 14, 59)}
+          set seconds of theEndDate to ${timeField(args.endDate, 17, 59)}
 
-          tell calendar "${args.calendar || "Calendar"}"
-            make new event with properties {summary:"${args.title}", start date:theStartDate, end date:theEndDate}
+          tell calendar "${esc(args.calendar || "Calendar")}"
+            make new event with properties {summary:"${esc(args.title)}", start date:theStartDate, end date:theEndDate}
           end tell
         end tell
       `,

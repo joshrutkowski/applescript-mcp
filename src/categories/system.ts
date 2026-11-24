@@ -1,4 +1,5 @@
 import { ScriptCategory } from "../types/index.js";
+import { escapeAppleScriptString as esc } from "../utils/escape.js";
 
 /**
  * System-related scripts.
@@ -49,10 +50,10 @@ export const systemCategory: ScriptCategory = {
       },
       script: (args) => `
             try
-              tell application "${args.name}"
+              tell application "${esc(args.name)}"
                 activate
               end tell
-              return "Application ${args.name} launched successfully"
+              return "Application ${esc(args.name)} launched successfully"
             on error errMsg
               return "Failed to launch application: " & errMsg
             end try
@@ -78,10 +79,10 @@ export const systemCategory: ScriptCategory = {
       },
       script: (args) => `
             try
-              tell application "${args.name}"
+              tell application "${esc(args.name)}"
                 ${args.force ? "quit saving no" : "quit"}
               end tell
-              return "Application ${args.name} quit successfully"
+              return "Application ${esc(args.name)} quit successfully"
             on error errMsg
               return "Failed to quit application: " & errMsg
             end try

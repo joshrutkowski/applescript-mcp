@@ -6,7 +6,7 @@ import {
   ErrorCode,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import { promisify } from "util";
 import os from "os";
 import {
@@ -16,7 +16,7 @@ import {
   LogLevel,
 } from "./types/index.js";
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 // Get system information for logging
 const systemInfo = {
@@ -179,9 +179,8 @@ export class AppleScriptFramework {
     
     try {
       const startTime = Date.now();
-      const { stdout } = await execAsync(
-        `osascript -e '${script.replace(/'/g, "'\"'\"'")}'`,
-      );
+      // execFile passes the script as one argv entry with no shell in between.
+      const { stdout } = await execFileAsync("osascript", ["-e", script]);
       const executionTime = Date.now() - startTime;
       
       this.log("debug", "AppleScript executed successfully", { 
@@ -273,7 +272,7 @@ export class AppleScriptFramework {
         
         const scriptContent =
           typeof script.script === "function"
-            ? script.script(request.params.arguments)
+            ? script.script(request.params.arguments ?? {})
             : script.script;
 
         const result = await this.executeScript(scriptContent);
