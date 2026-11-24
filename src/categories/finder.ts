@@ -1,6 +1,12 @@
 // src/categories/finder.ts
 import { ScriptCategory } from "../types/index.js";
 import { escapeAppleScriptString as esc } from "../utils/escape.js";
+import os from "os";
+
+/** Expand a leading "~" to the current user's home directory. */
+function expandHome(path: string): string {
+  return path === "~" || path.startsWith("~/") ? os.homedir() + path.slice(1) : path;
+}
 
 /**
  * Finder-related scripts.
@@ -55,7 +61,7 @@ export const finderCategory: ScriptCategory = {
         required: ["query"],
       },
       script: (args) => `
-        set searchPath to "/Users/joshrutkowski/Downloads"
+        set searchPath to "${esc(expandHome(String(args.location || "~")))}"
         tell application "Finder"
           try
             set theFolder to POSIX file searchPath as alias
