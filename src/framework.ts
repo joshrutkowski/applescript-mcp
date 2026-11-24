@@ -158,8 +158,7 @@ export class AppleScriptFramework {
       try {
         this.server.sendLoggingMessage({
           level: level,
-          message: message,
-          data: data || {},
+          data: { message, ...(data || {}) },
         });
       } catch (error) {
         // Silently ignore logging errors - we've already logged to console
