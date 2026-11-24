@@ -1,5 +1,12 @@
 // src/categories/finder.ts
 import { ScriptCategory } from "../types/index.js";
+import { escapeAppleScriptString as esc } from "../utils/escape.js";
+import os from "os";
+
+/** Expand a leading "~" to the current user's home directory. */
+function expandHome(path: string): string {
+  return path === "~" || path.startsWith("~/") ? os.homedir() + path.slice(1) : path;
+}
 
 /**
  * Finder-related scripts.
@@ -54,17 +61,17 @@ export const finderCategory: ScriptCategory = {
         required: ["query"],
       },
       script: (args) => `
-        set searchPath to "/Users/joshrutkowski/Downloads"
+        set searchPath to "${esc(expandHome(String(args.location || "~")))}"
         tell application "Finder"
           try
             set theFolder to POSIX file searchPath as alias
-            set theFiles to every file of folder theFolder whose name contains "${args.query}"
+            set theFiles to every file of folder theFolder whose name contains "${esc(args.query)}"
             set resultList to ""
             repeat with aFile in theFiles
               set resultList to resultList & (POSIX path of (aFile as alias)) & return
             end repeat
             if resultList is "" then
-              return "No files found matching '${args.query}'"
+              return "No files found matching '${esc(args.query)}'"
             end if
             return resultList
           on error errMsg
@@ -88,7 +95,7 @@ export const finderCategory: ScriptCategory = {
       },
       script: (args) => `
         try
-          set filePath to POSIX file "${args.path}"
+          set filePath to POSIX file "${esc(args.path)}"
           tell application "Finder"
             activate
             select filePath
@@ -98,7 +105,7 @@ export const finderCategory: ScriptCategory = {
               key code 49 -- Space key
             end tell
           end tell
-          return "Quick Look preview opened for ${args.path}"
+          return "Quick Look preview opened for ${esc(args.path)}"
         on error errMsg
           return "Failed to open Quick Look: " & errMsg
         end try

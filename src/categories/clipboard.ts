@@ -1,5 +1,6 @@
 // src/categories/clipboard.ts
 import { ScriptCategory } from "../types/index.js";
+import { escapeAppleScriptString as esc } from "../utils/escape.js";
 
 /**
  * Clipboard-related scripts.
@@ -76,7 +77,7 @@ export const clipboardCategory: ScriptCategory = {
       },
       script: (args) => `
         try
-          set the clipboard to "${args.content}"
+          set the clipboard to "${esc(args.content)}"
           return "Clipboard content set successfully"
         on error errMsg
           return "Failed to set clipboard: " & errMsg

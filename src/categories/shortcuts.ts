@@ -1,4 +1,5 @@
 import { ScriptCategory } from "../types/index.js";
+import { escapeAppleScriptString as esc, toBoundedInt } from "../utils/escape.js";
 
 /**
  * Shortcuts-related scripts.
@@ -30,11 +31,11 @@ export const shortcutsCategory: ScriptCategory = {
         try
           tell application "Shortcuts Events"
             ${args.input ? 
-              `run shortcut "${args.name}" with input "${args.input}"` :
-              `run shortcut "${args.name}"`
+              `run shortcut "${esc(args.name)}" with input "${esc(args.input)}"` :
+              `run shortcut "${esc(args.name)}"`
             }
           end tell
-          return "Shortcut '${args.name}' executed successfully"
+          return "Shortcut '${esc(args.name)}' executed successfully"
         on error errMsg
           return "Failed to run shortcut: " & errMsg
         end try
@@ -59,8 +60,8 @@ export const shortcutsCategory: ScriptCategory = {
             
             ${args.limit ? `
             -- Apply limit if specified
-            if (count of shortcutNames) > ${args.limit} then
-              set shortcutNames to items 1 through ${args.limit} of shortcutNames
+            if (count of shortcutNames) > ${toBoundedInt(args.limit, 1, 1, 10000)} then
+              set shortcutNames to items 1 through ${toBoundedInt(args.limit, 1, 1, 10000)} of shortcutNames
             end if
             ` : ``}
           end tell

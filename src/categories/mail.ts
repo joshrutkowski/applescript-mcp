@@ -1,4 +1,5 @@
 import { ScriptCategory } from "../types/index.js";
+import { escapeAppleScriptString as esc, toBoundedInt } from "../utils/escape.js";
 
 /**
  * Mail-related scripts.
@@ -32,9 +33,9 @@ export const mailCategory: ScriptCategory = {
         required: ["recipient", "subject", "body"],
       },
       script: (args) => `
-        set recipient to "${args.recipient}"
-        set subject to "${args.subject}"
-        set body to "${args.body}"
+        set recipient to "${esc(args.recipient)}"
+        set subject to "${esc(args.subject)}"
+        set body to "${esc(args.body)}"
 
         -- URL encode subject and body
         set encodedSubject to my urlEncode(subject)
@@ -98,9 +99,9 @@ export const mailCategory: ScriptCategory = {
         }
       },
       script: (args) => `
-        set mailboxName to "${args.mailbox || 'Inbox'}"
-        set accountName to "${args.account || 'iCloud'}"
-        set messageCount to ${args.count || 10}
+        set mailboxName to "${esc(args.mailbox || 'Inbox')}"
+        set accountName to "${esc(args.account || 'iCloud')}"
+        set messageCount to ${toBoundedInt(args.count, 10, 1, 1000)}
         set showUnreadOnly to ${args.unreadOnly ? 'true' : 'false'}
         set searchAllAccounts to ${!args.account ? 'true' : 'false'}
         
@@ -423,11 +424,11 @@ export const mailCategory: ScriptCategory = {
         required: []
       },
       script: (args) => `
-        set mailboxName to "${args.mailbox || 'Inbox'}"
-        set accountName to "${args.account || 'iCloud'}"
-        set searchSubject to "${args.subject || ''}"
-        set searchSender to "${args.sender || ''}"
-        set searchDate to "${args.dateReceived || ''}"
+        set mailboxName to "${esc(args.mailbox || 'Inbox')}"
+        set accountName to "${esc(args.account || 'iCloud')}"
+        set searchSubject to "${esc(args.subject || '')}"
+        set searchSender to "${esc(args.sender || '')}"
+        set searchDate to "${esc(args.dateReceived || '')}"
         set showUnreadOnly to ${args.unreadOnly ? 'true' : 'false'}
         set includeBody to ${args.includeBody ? 'true' : 'false'}
         set searchAllAccounts to ${!args.account ? 'true' : 'false'}
