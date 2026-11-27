@@ -10,6 +10,7 @@ import { pagesCategory } from "./categories/pages.js";
 import { shortcutsCategory } from "./categories/shortcuts.js";
 import { messagesCategory } from "./categories/messages.js";
 import { notesCategory } from "./categories/notes.js";
+import { remindersCategory } from "./categories/reminders.js";
 
 const server = new AppleScriptFramework({
   name: "applescript-server",
@@ -33,7 +34,8 @@ server.addCategory(pagesCategory);
 server.addCategory(shortcutsCategory);
 server.addCategory(messagesCategory);
 server.addCategory(notesCategory);
-console.error(`[INFO] Registered ${11} categories successfully`);
+server.addCategory(remindersCategory);
+console.error(`[INFO] Registered ${12} categories successfully`);
 
 // Start the server
 console.error("[INFO] Starting server...");

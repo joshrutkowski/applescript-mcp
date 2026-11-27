@@ -20,11 +20,11 @@ This server provides a standardized interface for AI applications to control sys
 - 💬 Messages (list chats, get messages, search messages, send a message)
 - 🗒️ Notes (create formatted notes, list notes, search notes)
 - 📄 Pages (create documents)
+- ✅ Reminders (create, get, list, search, complete, delete, list all lists)
 
 ### Planned Features
 
 - 🧭 Safari (open in Safari, save page content, get selected page/tab)
-- ✅ Reminders (create, get)
 
 ## Prerequisites
 
@@ -269,6 +269,40 @@ Find notes containing "recipe" in my "Cooking" folder
 ```
 // Create a new Pages document
 Create a Pages document with the content "Project Proposal\n\nThis document outlines the scope and timeline for the upcoming project."
+```
+
+### Reminders
+
+| Command | Description | Parameters |
+| ------- | ----------- | ---------- |
+| `create` | Create a new reminder | `name`, `notes` (optional), `list` (optional), `dueDate` (optional), `priority` (optional) |
+| `get` | Find a specific reminder | `name`, `list` (optional) |
+| `list` | List all reminders | `list` (optional), `completed` (optional), `limit` (optional) |
+| `search` | Search reminders by text | `query`, `list` (optional), `limit` (optional) |
+| `complete` | Mark reminder as complete | `name`, `list` (optional) |
+| `delete` | Delete a reminder | `name`, `list` (optional) |
+| `list_lists` | Show all reminder lists | None |
+
+#### Examples
+
+```
+// Create a new reminder
+Create a reminder called "Buy groceries" with notes "Milk, eggs, bread" due tomorrow at 2pm with high priority
+
+// List reminders
+Show me all my pending reminders
+
+// Search reminders
+Find reminders containing "meeting"
+
+// Complete a reminder
+Mark "Buy groceries" as completed
+
+// Delete a reminder
+Delete the reminder "Old task"
+
+// List all reminder lists
+Show me all my reminder lists with counts
 ```
 
 ## Architecture
